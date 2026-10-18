@@ -4,7 +4,7 @@
 //   PLAYWRIGHT=/path/index.mjs   override the Playwright location
 //   PREVIEW=1                    write a few still frames to ./preview instead of videos
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -20,6 +20,7 @@ const OUTPUTS = {
 };
 const formats = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(OUTPUTS);
 const fps = Number(process.env.FPS || 30);
+const music = resolve(here, 'music.wav');
 
 const browser = await chromium.launch();
 await Promise.all(formats.map(render));
@@ -49,11 +50,11 @@ async function render(format) {
   const ff = spawn('ffmpeg', [
     '-y', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-',
-    // silent stereo track so social platforms accept the upload
-    '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000',
+    // background music from music.py, or a silent track so platforms still accept the upload
+    ...(existsSync(music) ? ['-i', music] : ['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000']),
     '-shortest',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p',
-    '-c:a', 'aac', '-b:a', '128k',
+    '-c:a', 'aac', '-b:a', '192k',
     '-movflags', '+faststart', out,
   ], { stdio: ['pipe', 'inherit', 'inherit'] });
 

@@ -1,6 +1,6 @@
 # BSGP Technologies – 10s promo video
 
-All versions are 10 s, 30 fps, H.264 with a silent AAC track.
+All versions are 10 s, 30 fps, H.264 with an original background music track (AAC, -14 LUFS).
 
 | File | Size | Use it for |
 |------|------|------------|
@@ -21,6 +21,21 @@ The 9:16 layout keeps the bottom ~400px clear of text so TikTok/Reels captions a
 | 7.8–10s | Call to action: WhatsApp, phone, email, bsgptech.com |
 
 All screenshots in `assets/` were captured from https://bsgptech.com/ with headless Chromium.
+
+## Music
+
+`music.wav` is synthesised from scratch by `music.py` (no samples or third-party audio, so it is free to use on any platform). It runs at 150 BPM so each bar lands on a scene change: an intro swell and riser, a drop as the first service appears, one Am–F–C–G bar per service with a whoosh on each transition, and an impact and resolving chord on the call to action.
+
+```sh
+python3 music.py music_raw.wav
+ffmpeg -i music_raw.wav -af loudnorm=I=-14:TP=-1.5:LRA=7 -ar 48000 music.wav
+```
+
+`render.mjs` uses `music.wav` automatically (silent track if it is missing). To swap the music without re-rendering the picture:
+
+```sh
+ffmpeg -i bsgptech-demo-9x16.mp4 -i your-track.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -shortest out.mp4
+```
 
 ## Editing and re-rendering
 
