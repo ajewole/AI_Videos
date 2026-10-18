@@ -1,0 +1,460 @@
+{
+ "duration": 103.629,
+ "heart": {
+  "bpm": 64,
+  "bpm_after": 74
+ },
+ "scenes": [
+  {
+   "id": "hook",
+   "type": "hook",
+   "lead": 1.0,
+   "tail": 0.6,
+   "gap": 0.55,
+   "vo": [
+    "Your body whispers.",
+    "Before it screams."
+   ],
+   "start": 0.0,
+   "lines_t": [
+    [
+     1.0,
+     2.371
+    ],
+    [
+     2.921,
+     4.343
+    ]
+   ],
+   "resumes": [
+    [],
+    []
+   ],
+   "end": 4.943
+  },
+  {
+   "id": "intro",
+   "type": "title",
+   "tail": 0.7,
+   "vo": [
+    "Here are eight warning signs you should never ignore."
+   ],
+   "start": 4.943,
+   "lines_t": [
+    [
+     5.293,
+     8.157
+    ]
+   ],
+   "resumes": [
+    []
+   ],
+   "end": 8.857
+  },
+  {
+   "id": "s1",
+   "type": "sign",
+   "n": 1,
+   "icon": "heart",
+   "level": "emergency",
+   "title": "Chest pain or pressure",
+   "detail": "Tightness or squeezing that spreads to your arm, jaw or back",
+   "signal": "Heart attack",
+   "action": "Call emergency services now",
+   "vo": [
+    "One. Chest pain or pressure that spreads to your arm, jaw, or back.",
+    "It could be a heart attack. Call emergency services now."
+   ],
+   "start": 8.857,
+   "lines_t": [
+    [
+     9.207,
+     14.471
+    ],
+    [
+     14.721,
+     18.499
+    ]
+   ],
+   "resumes": [
+    [
+     9.947,
+     13.177
+    ],
+    [
+     16.541
+    ]
+   ],
+   "end": 19.049
+  },
+  {
+   "id": "s2",
+   "type": "sign",
+   "n": 2,
+   "icon": "brain",
+   "level": "emergency",
+   "title": "Face drooping, arm weakness, slurred speech",
+   "detail": "Remember F.A.S.T. — Face, Arms, Speech, Time",
+   "signal": "Stroke",
+   "action": "Every minute counts — call now",
+   "vo": [
+    "Two. A drooping face. A weak arm. Slurred speech.",
+    "That's a stroke. Every minute counts. Call for help."
+   ],
+   "start": 19.049,
+   "lines_t": [
+    [
+     19.399,
+     23.832
+    ],
+    [
+     24.082,
+     27.661
+    ]
+   ],
+   "resumes": [
+    [
+     20.159,
+     21.579,
+     22.869
+    ],
+    [
+     25.202,
+     26.592
+    ]
+   ],
+   "end": 28.211
+  },
+  {
+   "id": "s3",
+   "type": "sign",
+   "n": 3,
+   "icon": "bolt",
+   "level": "emergency",
+   "title": "The worst headache of your life",
+   "detail": "Sudden, explosive and unlike anything before",
+   "signal": "Bleeding in the brain",
+   "action": "Get emergency care",
+   "vo": [
+    "Three. A sudden, severe headache. The worst of your life.",
+    "It can mean bleeding in the brain. Get emergency care."
+   ],
+   "start": 28.211,
+   "lines_t": [
+    [
+     28.561,
+     32.598
+    ],
+    [
+     32.848,
+     36.193
+    ]
+   ],
+   "resumes": [
+    [
+     29.411,
+     31.181
+    ],
+    [
+     34.968
+    ]
+   ],
+   "end": 36.743
+  },
+  {
+   "id": "s4",
+   "type": "sign",
+   "n": 4,
+   "icon": "lungs",
+   "level": "doctor",
+   "title": "Breathless doing everyday things",
+   "detail": "Stairs, walking or lying flat suddenly leave you winded",
+   "signal": "Heart or lung disease",
+   "action": "See a doctor soon",
+   "vo": [
+    "Four. Getting breathless doing things that used to be easy.",
+    "Your heart or lungs may be struggling. See a doctor."
+   ],
+   "start": 36.743,
+   "lines_t": [
+    [
+     37.093,
+     40.669
+    ],
+    [
+     40.919,
+     44.284
+    ]
+   ],
+   "resumes": [
+    [
+     37.863
+    ],
+    [
+     43.449
+    ]
+   ],
+   "end": 44.834
+  },
+  {
+   "id": "s5",
+   "type": "sign",
+   "n": 5,
+   "icon": "drop",
+   "level": "doctor",
+   "title": "Constant thirst & frequent urination",
+   "detail": "Often with blurry vision, tiredness or slow-healing cuts",
+   "signal": "Diabetes",
+   "action": "Ask for a blood sugar test",
+   "vo": [
+    "Five. Constant thirst, and frequent urination.",
+    "Classic signs of diabetes. A simple blood test can tell you."
+   ],
+   "start": 44.834,
+   "lines_t": [
+    [
+     45.184,
+     48.75
+    ],
+    [
+     49.0,
+     52.974
+    ]
+   ],
+   "resumes": [
+    [
+     46.094,
+     47.474
+    ],
+    [
+     51.15
+    ]
+   ],
+   "end": 53.524
+  },
+  {
+   "id": "s6",
+   "type": "sign",
+   "n": 6,
+   "icon": "scale",
+   "level": "doctor",
+   "title": "Losing weight without trying",
+   "detail": "Around 5% of your body weight in 6–12 months, with no change in diet or exercise",
+   "signal": "Thyroid problems, diabetes or cancer",
+   "action": "Don't celebrate it — get checked",
+   "vo": [
+    "Six. Losing weight without trying.",
+    "It can point to thyroid problems, diabetes, or cancer. Get it checked."
+   ],
+   "start": 53.524,
+   "lines_t": [
+    [
+     53.874,
+     57.106
+    ],
+    [
+     57.356,
+     61.846
+    ]
+   ],
+   "resumes": [
+    [
+     54.604,
+     55.344
+    ],
+    [
+     61.126
+    ]
+   ],
+   "end": 62.396
+  },
+  {
+   "id": "s7",
+   "type": "sign",
+   "n": 7,
+   "icon": "mole",
+   "level": "doctor",
+   "title": "A mole that changes",
+   "detail": "New, growing, bleeding or changing in shape or color — or a sore that won't heal",
+   "signal": "Skin cancer",
+   "action": "Show it to a doctor",
+   "vo": [
+    "Seven. A mole that changes size, shape, or color.",
+    "Skin cancer is highly treatable, when it's caught early."
+   ],
+   "start": 62.396,
+   "lines_t": [
+    [
+     62.746,
+     66.894
+    ],
+    [
+     67.144,
+     70.542
+    ]
+   ],
+   "resumes": [
+    [
+     63.556,
+     65.296,
+     66.256
+    ],
+    [
+     68.354,
+     69.424
+    ]
+   ],
+   "end": 71.092
+  },
+  {
+   "id": "s8",
+   "type": "sign",
+   "n": 8,
+   "icon": "drop2",
+   "level": "doctor",
+   "title": "Blood where it shouldn't be",
+   "detail": "In your stool or urine — or bowel habits that change for weeks",
+   "signal": "Bowel, bladder or kidney disease",
+   "action": "Don't let embarrassment wait",
+   "vo": [
+    "Eight. Blood in your stool or urine.",
+    "It can be an early sign of bowel, bladder, or kidney disease. Don't let embarrassment cost you."
+   ],
+   "start": 71.092,
+   "lines_t": [
+    [
+     71.442,
+     73.916
+    ],
+    [
+     74.166,
+     80.108
+    ]
+   ],
+   "resumes": [
+    [
+     72.162
+    ],
+    [
+     76.296,
+     78.116
+    ]
+   ],
+   "end": 80.658
+  },
+  {
+   "id": "flat",
+   "type": "flat",
+   "lead": 0.0,
+   "tail": 1.6,
+   "vo": [],
+   "start": 80.658,
+   "lines_t": [],
+   "resumes": [],
+   "end": 82.258
+  },
+  {
+   "id": "turn1",
+   "type": "statement",
+   "lead": 0.3,
+   "tail": 0.8,
+   "lines": [
+    "Listening to your body",
+    "isn't fear.",
+    "It's self-respect."
+   ],
+   "vo": [
+    "Listening to your body isn't fear. It's self-respect."
+   ],
+   "start": 82.258,
+   "lines_t": [
+    [
+     82.558,
+     86.447
+    ]
+   ],
+   "resumes": [
+    [
+     85.278
+    ]
+   ],
+   "end": 87.247
+  },
+  {
+   "id": "turn2",
+   "type": "statement",
+   "tail": 0.8,
+   "lines": [
+    "Caught early,",
+    "most serious conditions",
+    "are far more treatable."
+   ],
+   "vo": [
+    "Caught early, most serious conditions are far more treatable."
+   ],
+   "start": 87.247,
+   "lines_t": [
+    [
+     87.597,
+     91.312
+    ]
+   ],
+   "resumes": [
+    [
+     88.917
+    ]
+   ],
+   "end": 92.112
+  },
+  {
+   "id": "turn3",
+   "type": "statement",
+   "tail": 0.9,
+   "lines": [
+    "So don't wait",
+    "for the scream."
+   ],
+   "vo": [
+    "So don't wait for the scream."
+   ],
+   "start": 92.112,
+   "lines_t": [
+    [
+     92.462,
+     94.156
+    ]
+   ],
+   "resumes": [
+    []
+   ],
+   "end": 95.056
+  },
+  {
+   "id": "cta",
+   "type": "cta",
+   "tail": 3.5,
+   "vo": [
+    "Book the check-up you've been putting off. Today.",
+    "And share this with someone you love."
+   ],
+   "start": 95.056,
+   "lines_t": [
+    [
+     95.406,
+     98.063
+    ],
+    [
+     98.313,
+     100.129
+    ]
+   ],
+   "resumes": [
+    [
+     97.436
+    ],
+    []
+   ],
+   "end": 103.629
+  }
+ ]
+}

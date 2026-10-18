@@ -1,0 +1,406 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Body Warning Signs</title>
+<style>
+  :root {
+    --bg: #06080d;
+    --ink: #f8fafc;
+    --muted: #a8b3c7;
+    --red: #ff3b4e;
+    --amber: #ffb020;
+    --teal: #2ee6a8;
+    --u: 1px;               /* scale unit, set per format */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  body { font-family: "Inter", sans-serif; color: var(--ink); }
+  .scene { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+  .abs { position: absolute; }
+  .disp { font-family: "Inter Display", "Inter", sans-serif; }
+
+  #glow { position: absolute; inset: 0; }
+  #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgba(0,0,0,.75) 100%); }
+  #grain { position: absolute; inset: 0; opacity: .05; background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.5) 0 1px, transparent 1px 3px); }
+  #ecg { position: absolute; left: 0; top: 0; overflow: visible; }
+  #progress { position: absolute; left: 0; bottom: 0; height: calc(8 * var(--u)); background: var(--accent, var(--red)); z-index: 50; }
+
+  /* hook */
+  .hook-a { font-size: calc(70 * var(--u)); font-weight: 300; color: var(--muted); letter-spacing: calc(2 * var(--u)); }
+  .hook-b { font-size: calc(128 * var(--u)); font-weight: 900; color: var(--red); letter-spacing: calc(-4 * var(--u)); margin-top: calc(10 * var(--u)); }
+  .center-stack { position: absolute; left: 0; right: 0; text-align: center; }
+
+  /* intro */
+  .big8 { font-size: calc(420 * var(--u)); font-weight: 900; line-height: .8; letter-spacing: calc(-20 * var(--u));
+          color: transparent; -webkit-text-stroke: calc(5 * var(--u)) var(--red); }
+  .intro-title { font-size: calc(92 * var(--u)); font-weight: 800; line-height: 1.02; letter-spacing: calc(-3 * var(--u)); }
+  .intro-title em { font-style: normal; color: var(--red); }
+  .kicker { font-size: calc(26 * var(--u)); font-weight: 700; letter-spacing: calc(7 * var(--u)); text-transform: uppercase; color: var(--muted); }
+  .disclaimer { font-size: calc(22 * var(--u)); color: #7d889c; line-height: 1.45; }
+
+  /* sign scenes */
+  .sign { position: absolute; display: flex; align-items: center; }
+  .icon-box { position: relative; flex: none; width: calc(var(--icon) * var(--u)); height: calc(var(--icon) * var(--u)); }
+  .icon-box .disc { position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c) 28%, transparent), color-mix(in srgb, var(--c) 6%, transparent) 70%);
+    border: calc(3 * var(--u)) solid color-mix(in srgb, var(--c) 70%, transparent);
+    box-shadow: 0 0 calc(80 * var(--u)) color-mix(in srgb, var(--c) 35%, transparent); }
+  .icon-box .ring { position: absolute; inset: 0; border-radius: 50%; border: calc(3 * var(--u)) solid var(--c); opacity: 0; }
+  .icon-box svg { position: absolute; inset: 22%; width: 56%; height: 56%; fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+  .icon-box svg .fill { fill: var(--c); stroke: none; }
+  .icon-box svg .acc { stroke: var(--c); }
+  .copy > * { will-change: transform; }
+  .sign-num { font-size: calc(28 * var(--u)); font-weight: 800; letter-spacing: calc(6 * var(--u)); color: var(--c); text-transform: uppercase; }
+  .sign-title { font-size: calc(var(--title) * var(--u)); font-weight: 800; line-height: 1.04; letter-spacing: calc(-2.5 * var(--u)); margin-top: calc(18 * var(--u)); }
+  .sign-detail { font-size: calc(var(--detail) * var(--u)); line-height: 1.4; color: var(--muted); margin-top: calc(22 * var(--u)); }
+  .sign-signal { margin-top: calc(34 * var(--u)); font-size: calc(var(--detail) * var(--u)); color: var(--muted); }
+  .sign-signal b { display: block; color: var(--ink); font-size: calc(var(--signal) * var(--u)); font-weight: 800; letter-spacing: calc(-1 * var(--u)); margin-top: calc(4 * var(--u)); }
+  .pill { display: inline-flex; align-items: center; gap: calc(18 * var(--u)); margin-top: calc(30 * var(--u));
+    padding: calc(18 * var(--u)) calc(34 * var(--u)) calc(18 * var(--u)) calc(22 * var(--u)); border-radius: 999px;
+    background: var(--c); color: #0a0a0a; font-size: calc(var(--pill) * var(--u)); font-weight: 800; letter-spacing: calc(-.5 * var(--u)); }
+  .pill svg { width: calc(var(--pill) * 1.25 * var(--u)); height: calc(var(--pill) * 1.25 * var(--u)); fill: none; stroke: #0a0a0a; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .level { display: inline-block; font-size: calc(22 * var(--u)); font-weight: 800; letter-spacing: calc(4 * var(--u)); padding: calc(7 * var(--u)) calc(16 * var(--u));
+    border-radius: calc(8 * var(--u)); border: calc(2 * var(--u)) solid var(--c); color: var(--c); margin-left: calc(18 * var(--u)); vertical-align: middle; }
+
+  #dots { position: absolute; display: flex; gap: calc(14 * var(--u)); z-index: 40; opacity: 0; }
+  #dots i { display: block; width: calc(44 * var(--u)); height: calc(8 * var(--u)); border-radius: 4px; background: rgba(255,255,255,.16); }
+
+  /* statements + cta */
+  .statement { position: absolute; left: 0; right: 0; text-align: center; padding: 0 calc(70 * var(--u)); }
+  .statement div { font-size: calc(var(--stmt) * var(--u)); font-weight: 800; line-height: 1.12; letter-spacing: calc(-3 * var(--u)); }
+  .statement div:last-child { color: var(--teal); }
+  .cta-icon { width: calc(150 * var(--u)); height: calc(150 * var(--u)); fill: none; stroke: var(--teal); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .cta-title { font-size: calc(var(--cta) * var(--u)); font-weight: 800; line-height: 1.06; letter-spacing: calc(-3 * var(--u)); }
+  .cta-today { font-size: calc(var(--today) * var(--u)); font-weight: 900; letter-spacing: calc(-6 * var(--u)); color: var(--teal); line-height: 1; margin-top: calc(10 * var(--u)); }
+  .share { display: inline-flex; align-items: center; gap: calc(20 * var(--u)); margin-top: calc(40 * var(--u)); padding: calc(20 * var(--u)) calc(36 * var(--u));
+    border-radius: 999px; border: calc(2 * var(--u)) solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); font-size: calc(var(--share) * var(--u)); font-weight: 700; }
+  .share svg { width: calc(var(--share) * 1.3 * var(--u)); height: calc(var(--share) * 1.3 * var(--u)); fill: none; stroke: var(--teal); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---- formats ---- */
+  body { --icon: 460; --title: 96; --detail: 36; --signal: 52; --pill: 36; --stmt: 120; --cta: 92; --today: 200; --share: 38; }
+  .f-landscape .sign { left: 150px; right: 150px; top: 120px; bottom: 170px; gap: 110px; }
+  .f-landscape .copy { width: 1050px; }
+
+  .f-vertical { --icon: 380; --title: 96; --detail: 40; --signal: 58; --pill: 40; --stmt: 92; --cta: 82; --today: 210; --share: 40; }
+  .f-vertical .sign, .f-square .sign, .f-portrait .sign { flex-direction: column; text-align: center; justify-content: center; }
+  .f-vertical .sign { left: 70px; right: 70px; top: 200px; bottom: 420px; gap: 70px; }
+  .f-vertical .copy { width: 100%; }
+  .f-vertical .hook-b, .f-square .hook-b, .f-portrait .hook-b { font-size: calc(104 * var(--u)); }
+  .f-vertical .disclaimer { font-size: 28px; }
+  .f-square .disclaimer, .f-portrait .disclaimer { font-size: 22px; }
+  .f-landscape .disclaimer { font-size: 24px; }
+
+  .f-square { --icon: 230; --title: 66; --detail: 28; --signal: 40; --pill: 28; --stmt: 86; --cta: 70; --today: 150; --share: 30; }
+  .f-square .sign { left: 60px; right: 60px; top: 70px; bottom: 90px; gap: 34px; }
+  .f-square .sign-title { margin-top: 10px; }
+  .f-square .sign-detail { margin-top: 12px; }
+  .f-square .sign-signal { margin-top: 18px; }
+  .f-square .pill { margin-top: 18px; padding: 13px 28px 13px 18px; }
+  .f-square .level { font-size: 18px; }
+  .f-square .sign-num { font-size: 22px; }
+
+  .f-portrait { --icon: 290; --title: 76; --detail: 31; --signal: 46; --pill: 32; --stmt: 96; --cta: 80; --today: 170; --share: 34; }
+  .f-portrait .sign { left: 60px; right: 60px; top: 110px; bottom: 120px; gap: 50px; }
+  .f-portrait .sign-title { margin-top: 12px; }
+  .f-portrait .sign-signal { margin-top: 24px; }
+  .f-portrait .pill { margin-top: 22px; }
+</style>
+</head>
+<body>
+<script src="timeline.js"></script>
+
+<div id="glow"></div>
+<svg id="ecg"><defs>
+  <linearGradient id="ecgGrad" gradientUnits="userSpaceOnUse"><stop offset="0" stop-opacity="0"/><stop offset=".55" stop-opacity=".55"/><stop offset="1" stop-opacity="1"/></linearGradient>
+  <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+  <path id="ecgGlow" fill="none" stroke-width="10" stroke-linejoin="round" filter="url(#soft)" opacity=".55"/>
+  <path id="ecgPath" fill="none" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle id="ecgHead" r="9"/>
+</svg>
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="dots"></div>
+<div id="stage"></div>
+<div id="progress"></div>
+
+<!-- icons: drawn on a 24x24 grid (phone, stethoscope, calendar, share adapted from Lucide, ISC licence) -->
+<template id="icons">
+  <svg data-i="heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path class="acc" d="M3.2 12H9l1-2 2 5 2-7 1.5 4h5.3"/></svg>
+  <svg data-i="face" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><circle class="fill" cx="8.6" cy="9.6" r="1.2"/><path class="acc" d="M14.2 10.2h2.4"/><path class="acc" d="M7.6 14.6c1.6.4 3.2.6 4.8.9 1.4.3 2.6 1 3.6 2.2"/></svg>
+  <svg data-i="bolt" viewBox="0 0 24 24"><path d="M5 11a7 7 0 1 1 13.2 3.3c-.5.9-.7 1.5-.7 2.6V21H9v-2.2H7.4A1.6 1.6 0 0 1 5.8 17.2V14.6L4.4 13.9 5 11.6"/><path class="acc" d="M12.6 5.2 9.6 10.4h3.2l-1.6 4.4 3.8-5.6h-3.2l1.4-4"/></svg>
+  <svg data-i="lungs" viewBox="0 0 24 24"><path d="M12 3v8.5M12 11.5l-2.6 2M12 11.5l2.6 2"/><path class="acc" d="M9.4 7.4C6.2 7.6 4 12 4 16.4c0 2.4 1 3.8 2.9 3.8 1.8 0 2.5-1.3 2.5-3.2V7.4z"/><path class="acc" d="M14.6 7.4c3.2.2 5.4 4.6 5.4 9 0 2.4-1 3.8-2.9 3.8-1.8 0-2.5-1.3-2.5-3.2V7.4z"/></svg>
+  <svg data-i="glass" viewBox="0 0 24 24"><path d="M5.5 3h13l-1.7 17.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8z"/><path class="acc" d="M6.3 10c2-.9 3.8-.9 5.7 0s3.8.9 5.7 0"/><path class="acc" d="M10 14.5v.01M13.5 17v.01M12.5 12.8v.01"/></svg>
+  <svg data-i="scale" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7.5 10a4.5 4.5 0 0 1 9 0"/><path class="acc" d="M12 10.2l2.4-2.8"/><path class="acc" d="M12 14.5v4M10.2 16.8 12 18.6l1.8-1.8"/></svg>
+  <svg data-i="mole" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7.5"/><path d="m16 16 5.5 5.5"/><path class="fill" d="M9.2 6.6c1.9-1 4.1-.3 4.7 1.4.6 1.9-.6 2.6-.4 4.1.2 1.7-1.5 2.9-3.4 2.4-2.1-.5-3.4-2.1-3.1-4.2.2-1.5 1-2.9 2.2-3.7z"/></svg>
+  <svg data-i="drop" viewBox="0 0 24 24"><path class="fill" d="M12 2.8s-6.5 7.4-6.5 12a6.5 6.5 0 0 0 13 0c0-4.6-6.5-12-6.5-12z"/><path d="M12 2.8s-6.5 7.4-6.5 12a6.5 6.5 0 0 0 13 0c0-4.6-6.5-12-6.5-12z"/><path d="M8.8 15.2a3.2 3.2 0 0 0 2.4 3" stroke="#fff" opacity=".8"/></svg>
+  <svg data-i="phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  <svg data-i="steth" viewBox="0 0 24 24"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+  <svg data-i="calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m8.5 15.5 2.5 2.5 4.5-4.5"/></svg>
+  <svg data-i="share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+</template>
+
+<script>
+  const TL = window.TIMELINE, DURATION = TL.duration, FADE = 0.4;
+  const $ = (s, r = document) => r.querySelector(s);
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+  const easeInOut = x => (x = clamp(x), x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const prog = (t, start, dur) => ease((t - start) / dur);
+  const COLORS = { red: [255, 59, 78], amber: [255, 176, 32], teal: [46, 230, 168], gray: [120, 130, 150] };
+  const icon = (name, cls = '') => $(`#icons`).content.querySelector(`[data-i="${name}"]`).outerHTML.replace('<svg', `<svg class="${cls}"`);
+  const ICON_FOR = { heart: 'heart', brain: 'face', bolt: 'bolt', lungs: 'lungs', drop: 'glass', scale: 'scale', mole: 'mole', drop2: 'drop' };
+
+  const FORMATS = {
+    landscape: { w: 1920, h: 1080, u: 1, ecgY: 935, ecgAmp: 70 },
+    vertical: { w: 1080, h: 1920, u: 1, ecgY: 1640, ecgAmp: 90 },
+    square: { w: 1080, h: 1080, u: .78, ecgY: 965, ecgAmp: 40 },
+    portrait: { w: 1080, h: 1350, u: .86, ecgY: 1225, ecgAmp: 50 },
+  };
+  const FORMAT = new URLSearchParams(location.search).get('format') || 'landscape';
+  const F = FORMATS[FORMAT];
+  document.body.classList.add('f-' + FORMAT);
+  for (const el of [document.documentElement, document.body]) { el.style.width = F.w + 'px'; el.style.height = F.h + 'px'; }
+  document.body.style.setProperty('--u', F.u + 'px');
+  const V = FORMAT !== 'landscape';            // stacked, centred layouts
+  const TOP = { landscape: 0, vertical: 140, square: 0, portrait: 30 }[FORMAT];
+  const BOTTOM = { landscape: 0, vertical: 420, square: 0, portrait: 40 }[FORMAT];  // keep clear of Reels/TikTok UI
+
+  // ---- build scenes from the timeline ----
+  const stage = $('#stage');
+  const signs = TL.scenes.filter(s => s.type === 'sign');
+  $('#dots').innerHTML = signs.map(() => '<i></i>').join('');
+  const midY = (TOP + F.h - BOTTOM) / 2;
+  // disclaimers sit just under the ECG baseline (vertical: above the platform UI zone instead)
+  const disclaimerTop = FORMAT === 'vertical' ? F.h - BOTTOM - 150 : F.ecgY + 36 * F.u;
+
+  TL.scenes.forEach((s, i) => {
+    const el = document.createElement('section');
+    el.className = 'scene';
+    el.id = 'sc-' + s.id;
+    if (s.type === 'hook') {
+      el.innerHTML = `<div class="center-stack" style="top:${midY - 200 * F.u}px">
+        <div class="hook-a disp">Your body whispers.</div>
+        <div class="hook-b disp">Before it screams.</div></div>`;
+    } else if (s.type === 'title') {
+      el.innerHTML = `<div class="center-stack" style="top:${midY - (V ? 470 : 360) * F.u}px">
+        <div class="kicker">Listen closely</div>
+        <div class="big8 disp" style="margin-top:${30 * F.u}px">8</div>
+        <div class="intro-title disp" style="margin-top:${40 * F.u}px">warning signs<br><em>you should never ignore</em></div></div>
+        <div class="center-stack disclaimer" style="top:${disclaimerTop}px;padding:0 60px">Health awareness, not medical advice. If in doubt, see a doctor.</div>`;
+    } else if (s.type === 'sign') {
+      const c = s.level === 'emergency' ? 'red' : 'amber';
+      el.style.setProperty('--c', `var(--${c})`);
+      el.innerHTML = `<div class="sign">
+        <div class="icon-box"><div class="ring"></div><div class="ring"></div><div class="disc"></div>${icon(ICON_FOR[s.icon])}</div>
+        <div class="copy">
+          <div class="sign-num">Sign ${String(s.n).padStart(2, '0')}<span class="level">${s.level === 'emergency' ? 'EMERGENCY' : 'DON’T WAIT'}</span></div>
+          <div class="sign-title disp">${s.title}</div>
+          <div class="sign-detail">${s.detail}</div>
+          <div class="sign-signal">Can be a sign of<b>${s.signal}</b></div>
+          <div class="pill">${icon(s.level === 'emergency' ? 'phone' : 'steth')}<span>${s.action}</span></div>
+        </div></div>`;
+    } else if (s.type === 'statement') {
+      el.innerHTML = `<div class="statement disp" style="top:${midY}px">${s.lines.map(l => `<div>${l}</div>`).join('')}</div>`;
+    } else if (s.type === 'cta') {
+      el.innerHTML = `<div class="center-stack" id="ctaBox" style="padding:0 ${V ? 60 : 200}px">
+        ${icon('calendar', 'cta-icon')}
+        <div class="cta-title disp" style="margin-top:${30 * F.u}px">Book the check-up<br>you’ve been putting off.</div>
+        <div class="cta-today disp">TODAY.</div>
+        <div class="share">${icon('share')}<span>Share this with someone you love</span></div></div>
+        <div class="center-stack disclaimer" style="top:${disclaimerTop}px;padding:0 70px">
+        For awareness only — not a diagnosis or medical advice.<br>In an emergency call your local emergency number (911 · 999 · 112).</div>`;
+    }
+    stage.appendChild(el);
+    s.el = el;
+  });
+  // vertically centre the cta block and statements once laid out
+  const centre = el => { el.style.top = (midY - el.offsetHeight / 2) + 'px'; };
+
+  // ---- heartbeat: identical schedule to heart_beats() in music.py ----
+  const SC = Object.fromEntries(TL.scenes.map(s => [s.id, s]));
+  const BEATS = (() => {
+    const out = [], flat = SC.flat.start, turn = SC.turn1.start;
+    for (let t = 0.5; t < flat - 0.2; t += 60 / TL.heart.bpm) out.push(t);
+    for (let t = turn + 0.15; t < DURATION - 1.5; t += 60 / TL.heart.bpm_after) out.push(t);
+    return out;
+  })();
+  const lastBeat = t => { let b = -99; for (const x of BEATS) { if (x <= t) b = x; else break; } return b; };
+  const g = (x, m, w) => Math.exp(-((x - m) ** 2) / (2 * w * w));
+  function ecgValue(tau) {
+    let v = 0;
+    for (const b of BEATS) {
+      const d = tau - b;
+      if (d < -0.3 || d > 0.5) continue;
+      v += 0.12 * g(d, -0.16, 0.03) - 0.15 * g(d, -0.03, 0.01) + 1.0 * g(d, 0, 0.011) - 0.32 * g(d, 0.035, 0.012) + 0.26 * g(d, 0.24, 0.05);
+    }
+    return v;
+  }
+
+  // ---- colour for the moment (glow + ECG + accent) ----
+  function moodAt(t) {
+    const s = TL.scenes.find(s => t >= s.start && t < s.end) || TL.scenes[TL.scenes.length - 1];
+    const key = s.type === 'sign' ? (s.level === 'emergency' ? 'red' : 'amber')
+      : s.type === 'flat' ? 'gray' : (s.type === 'statement' || s.type === 'cta') ? 'teal' : 'red';
+    return { s, col: COLORS[key], key };
+  }
+  function colourAt(t) {
+    // blend toward the next scene's colour over the crossfade
+    const { s, col } = moodAt(t);
+    const next = moodAt(s.end + 0.01).col;
+    const k = clamp((t - (s.end - FADE)) / FADE);
+    return col.map((c, i) => Math.round(c + (next[i] - c) * k));
+  }
+
+  function drawECG(t, rgb, scene) {
+    // the trace is large and central in the hook and the flatline, a thin band elsewhere
+    let k = 0;
+    if (scene.type === 'hook') k = 1 - prog(t, scene.lines_t[1][1] + 0.1, 0.6);
+    if (scene.type === 'flat') k = prog(t, scene.start, 0.6);
+    if (scene.id === 'turn1') k = 1 - prog(t, scene.start + 0.2, 0.9);
+    const y = F.ecgY + (midY + (scene.type === 'hook' ? 220 * F.u : 0) - F.ecgY) * k;
+    const amp = F.ecgAmp * (1 + 1.4 * k);
+    const headX = F.w * 0.86, pxPerSec = F.w / 4.2;
+    let d = '';
+    for (let x = 0; x <= headX; x += 4) {
+      const tau = t - (headX - x) / pxPerSec;
+      d += (x ? 'L' : 'M') + x.toFixed(0) + ' ' + (y - ecgValue(tau) * amp).toFixed(1);
+    }
+    const c = `rgb(${rgb})`;
+    $('#ecgPath').setAttribute('d', d);
+    $('#ecgGlow').setAttribute('d', d);
+    $('#ecgGrad').setAttribute('x2', headX);
+    $('#ecgGrad').querySelectorAll('stop').forEach(st => st.setAttribute('stop-color', c));
+    $('#ecgPath').setAttribute('stroke', 'url(#ecgGrad)');
+    $('#ecgGlow').setAttribute('stroke', c);
+    const head = $('#ecgHead');
+    head.setAttribute('cx', headX);
+    head.setAttribute('cy', y - ecgValue(t) * amp);
+    head.setAttribute('fill', c);
+    head.setAttribute('r', 7 + 6 * Math.exp(-(t - lastBeat(t)) * 6));
+    $('#ecg').style.opacity = (0.55 + 0.45 * k) * clamp(t / 0.8);
+    $('#ecg').setAttribute('width', F.w); $('#ecg').setAttribute('height', F.h);
+  }
+
+  function rise(el, p, dist = 50) {
+    el.style.opacity = p;
+    el.style.transform = `translateY(${(1 - p) * dist * F.u}px)`;
+  }
+
+  window.renderFrame = function (t) {
+    const { s: cur } = moodAt(t);
+    const rgb = colourAt(t);
+    document.body.style.setProperty('--accent', `rgb(${rgb})`);
+    const pulse = Math.exp(-(t - lastBeat(t)) * 5);
+    $('#glow').style.background = `radial-gradient(${F.w * 0.9}px ${F.h * 0.75}px at 50% ${V ? 38 : 45}%, rgba(${rgb},${0.16 + 0.06 * pulse}), transparent 70%), linear-gradient(180deg, #0a0d15, #05070b)`;
+    drawECG(t, rgb.join(','), cur);
+
+    TL.scenes.forEach((s, i) => {
+      const fin = i === 0 ? 1 : clamp((t - s.start) / FADE);
+      const fout = i === TL.scenes.length - 1 ? 1 : clamp((s.end + FADE - t) / FADE);
+      const vis = t >= s.start && t < s.end + FADE ? Math.min(fin, fout) : 0;
+      s.el.style.opacity = vis;
+      s.el.style.zIndex = i;
+      if (vis > 0) animate(s, t - s.start, t);
+    });
+
+    // sign progress dots
+    const inSigns = t > signs[0].start - 0.2 && t < signs[signs.length - 1].end;
+    const dots = $('#dots');
+    dots.style.opacity = inSigns ? clamp(Math.min((t - signs[0].start) / .4, (signs[signs.length - 1].end - t) / .4)) : 0;
+    dots.style.left = (F.w - dots.offsetWidth) / 2 + 'px';
+    dots.style.top = (V ? TOP + 50 * F.u : 56) + 'px';
+    [...dots.children].forEach((d, k) => {
+      const s = signs[k];
+      const done = t >= s.end ? 1 : t >= s.start ? clamp((t - s.start) / (s.end - s.start)) : 0;
+      const c = s.level === 'emergency' ? COLORS.red : COLORS.amber;
+      d.style.background = `linear-gradient(90deg, rgb(${c}) ${done * 100}%, rgba(255,255,255,.16) ${done * 100}%)`;
+    });
+    $('#progress').style.width = (t / DURATION * 100) + '%';
+  };
+
+  function animate(s, lt, t) {
+    const el = s.el, L = s.lines_t;
+    if (s.type === 'hook') {
+      const a = $('.hook-a', el), b = $('.hook-b', el);
+      const pa = prog(t, L[0][0] - 0.15, 0.9);
+      a.style.opacity = pa; a.style.filter = `blur(${(1 - pa) * 8}px)`;
+      a.style.transform = `scale(${1.04 - 0.04 * pa})`;
+      const pb = prog(t, L[1][0] - 0.05, 0.25);
+      const shake = t > L[1][0] && t < L[1][0] + 0.5 ? Math.sin(t * 90) * 8 * (1 - (t - L[1][0]) / 0.5) * F.u : 0;
+      b.style.opacity = pb;
+      b.style.transform = `translateX(${shake}px) scale(${1.5 - 0.5 * pb})`;
+      return;
+    }
+    if (s.type === 'title') {
+      const kids = $('.center-stack', el).children;
+      rise(kids[0], prog(t, s.start + 0.1, .5));
+      const p8 = prog(t, L[0][0], .5);
+      kids[1].style.opacity = p8;
+      kids[1].style.transform = `scale(${1.3 - 0.3 * p8 + 0.03 * Math.exp(-(t - lastBeat(t)) * 6)})`;
+      rise(kids[2], prog(t, L[0][0] + 0.9, .5));
+      rise($('.disclaimer', el), prog(t, L[0][0] + 1.4, .6), 20);
+      return;
+    }
+    if (s.type === 'sign') {
+      const box = $('.icon-box', el), copy = $('.copy', el).children;
+      const pi = prog(t, s.start + 0.05, .55);
+      const beat = Math.exp(-(t - lastBeat(t)) * 7);
+      box.style.opacity = pi;
+      box.style.transform = `scale(${(0.7 + 0.3 * pi) * (1 + 0.035 * beat)})`;
+      el.querySelectorAll('.ring').forEach((r, k) => {
+        const age = ((t - lastBeat(t)) + k * 0.45) % 0.9;
+        r.style.opacity = (0.5 * (1 - age / 0.9)) * pi;
+        r.style.transform = `scale(${1 + age * 0.45})`;
+      });
+      rise(copy[0], prog(t, s.start + 0.15, .45));
+      rise(copy[1], prog(t, s.start + 0.25, .5));
+      rise(copy[2], prog(t, (s.resumes[0][0] || L[0][0] + 0.8) - 0.1, .5));
+      const second = L[1][0];
+      rise(copy[3], prog(t, second - 0.1, .45));
+      const pp = prog(t, second + 0.5, .45);
+      copy[4].style.opacity = pp;
+      copy[4].style.transform = `scale(${0.85 + 0.15 * pp})`;
+      // gentle drift so the frame is never static
+      $('.sign', el).style.transform = `translateY(${-lt * 3 * F.u}px)`;
+      return;
+    }
+    if (s.type === 'statement') {
+      const box = $('.statement', el);
+      if (!box.dataset.c) { centre(box); box.dataset.c = 1; }
+      const kids = box.children;
+      const starts = [L[0][0] - 0.1, ...(s.resumes[0] || [])];
+      [...kids].forEach((k, j) => {
+        const st = starts[j] ?? (L[0][0] + (L[0][1] - L[0][0]) * j / kids.length);
+        const p = prog(t, st - 0.1, .55);
+        k.style.opacity = p;
+        k.style.filter = `blur(${(1 - p) * 10}px)`;
+        k.style.transform = `translateY(${(1 - p) * 40 * F.u}px)`;
+      });
+      box.style.transform = `scale(${1 + lt * 0.006})`;
+      return;
+    }
+    if (s.type === 'cta') {
+      const box = $('#ctaBox', el);
+      if (!box.dataset.c) { centre(box); box.dataset.c = 1; }
+      const [ic, title, today, share] = box.children;
+      const pi = prog(t, s.start + 0.05, .5);
+      ic.style.opacity = pi; ic.style.transform = `scale(${0.6 + 0.4 * pi})`;
+      rise(title, prog(t, L[0][0], .55));
+      const todayT = (s.resumes[0] && s.resumes[0][0]) || L[0][1] - 0.5;
+      const pt = prog(t, todayT - 0.05, .3);
+      today.style.opacity = pt;
+      today.style.transform = `scale(${(1.6 - 0.6 * pt) * (1 + 0.025 * Math.exp(-(t - lastBeat(t)) * 6))})`;
+      rise(share, prog(t, L[1][0] - 0.1, .5));
+      rise($('.disclaimer', el), prog(t, L[1][1], .6), 20);
+    }
+  }
+
+  window.FORMATS = FORMATS;
+  window.DURATION = DURATION;
+  window.PREVIEW_TIMES = TL.scenes.filter(s => s.type !== 'flat').map(s => +(s.end - 0.6).toFixed(2));
+  renderFrame(Number(new URLSearchParams(location.search).get('t') || 0));
+</script>
+</body>
+</html>

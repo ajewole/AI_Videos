@@ -1,0 +1,22 @@
+{
+  "voice": "en_US-john-medium",
+  "length_scale": 0.9,
+  "heart": { "bpm": 64, "bpm_after": 74 },
+  "scenes": [
+    {"id": "hook", "type": "hook", "lead": 1.0, "tail": 0.6, "gap": 0.55, "vo": ["Your body whispers.", "Before it screams."]},
+    {"id": "intro", "type": "title", "tail": 0.7, "vo": ["Here are eight warning signs you should never ignore."]},
+    {"id": "s1", "type": "sign", "n": 1, "icon": "heart", "level": "emergency", "title": "Chest pain or pressure", "detail": "Tightness or squeezing that spreads to your arm, jaw or back", "signal": "Heart attack", "action": "Call emergency services now", "vo": ["One. Chest pain or pressure that spreads to your arm, jaw, or back.", "It could be a heart attack. Call emergency services now."]},
+    {"id": "s2", "type": "sign", "n": 2, "icon": "brain", "level": "emergency", "title": "Face drooping, arm weakness, slurred speech", "detail": "Remember F.A.S.T. — Face, Arms, Speech, Time", "signal": "Stroke", "action": "Every minute counts — call now", "vo": ["Two. A drooping face. A weak arm. Slurred speech.", "That's a stroke. Every minute counts. Call for help."]},
+    {"id": "s3", "type": "sign", "n": 3, "icon": "bolt", "level": "emergency", "title": "The worst headache of your life", "detail": "Sudden, explosive and unlike anything before", "signal": "Bleeding in the brain", "action": "Get emergency care", "vo": ["Three. A sudden, severe headache. The worst of your life.", "It can mean bleeding in the brain. Get emergency care."]},
+    {"id": "s4", "type": "sign", "n": 4, "icon": "lungs", "level": "doctor", "title": "Breathless doing everyday things", "detail": "Stairs, walking or lying flat suddenly leave you winded", "signal": "Heart or lung disease", "action": "See a doctor soon", "vo": ["Four. Getting breathless doing things that used to be easy.", "Your heart or lungs may be struggling. See a doctor."]},
+    {"id": "s5", "type": "sign", "n": 5, "icon": "drop", "level": "doctor", "title": "Constant thirst & frequent urination", "detail": "Often with blurry vision, tiredness or slow-healing cuts", "signal": "Diabetes", "action": "Ask for a blood sugar test", "vo": ["Five. Constant thirst, and frequent urination.", "Classic signs of diabetes. A simple blood test can tell you."]},
+    {"id": "s6", "type": "sign", "n": 6, "icon": "scale", "level": "doctor", "title": "Losing weight without trying", "detail": "Around 5% of your body weight in 6–12 months, with no change in diet or exercise", "signal": "Thyroid problems, diabetes or cancer", "action": "Don't celebrate it — get checked", "vo": ["Six. Losing weight without trying.", "It can point to thyroid problems, diabetes, or cancer. Get it checked."]},
+    {"id": "s7", "type": "sign", "n": 7, "icon": "mole", "level": "doctor", "title": "A mole that changes", "detail": "New, growing, bleeding or changing in shape or color — or a sore that won't heal", "signal": "Skin cancer", "action": "Show it to a doctor", "vo": ["Seven. A mole that changes size, shape, or color.", "Skin cancer is highly treatable, when it's caught early."]},
+    {"id": "s8", "type": "sign", "n": 8, "icon": "drop2", "level": "doctor", "title": "Blood where it shouldn't be", "detail": "In your stool or urine — or bowel habits that change for weeks", "signal": "Bowel, bladder or kidney disease", "action": "Don't let embarrassment wait", "vo": ["Eight. Blood in your stool or urine.", "It can be an early sign of bowel, bladder, or kidney disease. Don't let embarrassment cost you."]},
+    {"id": "flat", "type": "flat", "lead": 0.0, "tail": 1.6, "vo": []},
+    {"id": "turn1", "type": "statement", "lead": 0.3, "tail": 0.8, "lines": ["Listening to your body", "isn't fear.", "It's self-respect."], "vo": ["Listening to your body isn't fear. It's self-respect."]},
+    {"id": "turn2", "type": "statement", "tail": 0.8, "lines": ["Caught early,", "most serious conditions", "are far more treatable."], "vo": ["Caught early, most serious conditions are far more treatable."]},
+    {"id": "turn3", "type": "statement", "tail": 0.9, "lines": ["So don't wait", "for the scream."], "vo": ["So don't wait for the scream."]},
+    {"id": "cta", "type": "cta", "tail": 3.5, "vo": ["Book the check-up you've been putting off. Today.", "And share this with someone you love."]}
+  ]
+}
