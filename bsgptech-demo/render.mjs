@@ -1,5 +1,6 @@
 // Renders scene.html frame-by-frame with headless Chromium and encodes it with ffmpeg.
 // Usage: node render.mjs [format ...]     formats: landscape vertical square portrait (default: all)
+//   CUT=30                       30-second cut (default 10); outputs get a -30s suffix
 //   FPS=30                       frame rate
 //   PLAYWRIGHT=/path/index.mjs   override the Playwright location
 //   PREVIEW=1                    write a few still frames to ./preview instead of videos
@@ -20,7 +21,9 @@ const OUTPUTS = {
 };
 const formats = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(OUTPUTS);
 const fps = Number(process.env.FPS || 30);
-const music = resolve(here, 'music.wav');
+const cut = process.env.CUT || '10';
+const suffix = cut === '10' ? '' : `-${cut}s`;
+const music = resolve(here, `music${suffix}.wav`);
 
 const browser = await chromium.launch();
 await Promise.all(formats.map(render));
@@ -29,7 +32,7 @@ await browser.close();
 async function render(format) {
   if (!OUTPUTS[format]) throw new Error(`Unknown format "${format}"`);
   const page = await browser.newPage({ viewport: { width: 1920, height: 1920 } });
-  await page.goto(pathToFileURL(resolve(here, 'scene.html')).href + '?format=' + format);
+  await page.goto(pathToFileURL(resolve(here, 'scene.html')).href + `?format=${format}&cut=${cut}`);
   const { w, h } = await page.evaluate(f => window.FORMATS[f], format);
   await page.setViewportSize({ width: w, height: h });
   await page.evaluate(() => document.fonts.ready);
@@ -38,15 +41,17 @@ async function render(format) {
 
   if (process.env.PREVIEW) {
     mkdirSync(resolve(here, 'preview'), { recursive: true });
-    for (const t of [0.9, 2.4, 4.0, 5.6, 7.2, 9.5]) {
+    // one still near the end of each scene, once its animations have settled
+    const times = await page.evaluate(() => window.SCENES.map(([, a, b]) => a + (b - a) * 0.8));
+    for (const t of times) {
       await page.evaluate(t => renderFrame(t), t);
-      await page.screenshot({ path: resolve(here, 'preview', `${format}-t${t.toFixed(1)}.png`) });
+      await page.screenshot({ path: resolve(here, 'preview', `${format}${suffix}-t${t.toFixed(1)}.png`) });
     }
     await page.close();
     return;
   }
 
-  const out = resolve(here, OUTPUTS[format]);
+  const out = resolve(here, OUTPUTS[format].replace('.mp4', `${suffix}.mp4`));
   const ff = spawn('ffmpeg', [
     '-y', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-',

@@ -1,10 +1,11 @@
-"""Synthesises an original 10 s background track for the promo (no samples, no licensing).
+"""Synthesises an original background track for the promo (no samples, no licensing).
 
-150 BPM, so one bar (1.6 s) matches one service scene in scene.html:
-  0.0-1.4  intro swell + riser + snare roll
-  1.4-7.8  four bars of Am - F - C - G with drums, bass and a plucked arpeggio
-  7.8-10   impact on the call to action, held C major chord fading out
-Usage: python3 music.py [out.wav]
+150 BPM, so scene changes in scene.html land on bar lines (1 bar = 1.6 s):
+  0 .. DROP     build: filtered pad + plucks (light hats over full bars), riser and snare roll
+  DROP .. CTA   Am - F - C - G loop with drums, bass and a plucked arpeggio; whoosh on each scene change,
+                extra layers on later loops, riser into the call to action
+  CTA .. end    impact, resolving C major chord (with a soft arpeggio on longer cuts), fade out
+Usage: python3 music.py [out.wav] [cut]     cut: 10 (default) or 30, matching CUTS in scene.html
 """
 import sys
 import wave
@@ -12,11 +13,15 @@ import wave
 import numpy as np
 
 SR = 48000
-DUR = 10.0
 BEAT = 60 / 150
 BAR = 4 * BEAT
-DROP = 1.4           # first service scene
-CTA = 7.8            # call-to-action scene
+CUTS = {
+    # duration, first service scene (beat drops), call to action, scene changes that get a whoosh
+    '10': dict(dur=10.0, drop=1.4, cta=7.8, changes=[1.4, 3.0, 4.6, 6.2]),
+    '30': dict(dur=30.0, drop=6.4, cta=25.6, changes=[3.2, 6.4, 10.4, 14.4, 18.4, 22.4]),
+}
+CUT = CUTS[sys.argv[2] if len(sys.argv) > 2 else '10']
+DUR, DROP, CTA = CUT['dur'], CUT['drop'], CUT['cta']
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 
@@ -146,20 +151,39 @@ def noise_sweep(length, rise=True, gain=0.22):
 CHORDS = [(45, [57, 60, 64]), (41, [57, 60, 65]), (48, [55, 60, 64]), (43, [55, 59, 62])]
 ARP = [0, 1, 2, 1, 2, 1, 0, 2]  # indexes into chord tones (+12) per 8th
 
-# Intro: filtered Am pad swelling, noise riser, snare roll into the drop
-add(pad([57, 60, 64, 69], DROP + 0.2, gain=0.09, cutoff=900), 0.0, verb=0.4)
-add(noise_sweep(DROP, rise=True, gain=0.25), 0.0, verb=0.3)
+# Build: full bars of the progression before the drop, any leftover at the start held on Am
+build_bars = int(DROP / BAR + 1e-9)
+lead_in = DROP - build_bars * BAR
+if lead_in > 0.05:
+    add(pad([57, 60, 64, 69], lead_in + 0.2, gain=0.09, cutoff=900), 0.0, verb=0.4)
+    add(pluck(69, 0.5, 0.12), 0.05, pan=-0.3, verb=0.6)
+    add(pluck(76, 0.5, 0.10), 0.05 + BEAT, pan=0.3, verb=0.6)
+for k in range(build_bars):
+    t0 = lead_in + k * BAR
+    root, tones = CHORDS[k % 4]
+    add(pad(tones + [tones[0] + 12], BAR + 0.15, gain=0.08, cutoff=900 + 500 * k), t0, verb=0.45)
+    add(bass(root, BAR - 0.05, 0.22), t0)
+    for j, idx in enumerate(ARP):
+        add(pluck(tones[idx] + 12, 0.35, 0.09), t0 + j * BEAT / 2, pan=(-0.4 if j % 2 else 0.4), verb=0.5)
+    if k >= build_bars // 2:
+        for beat in range(4):
+            add(hat(0.07), t0 + beat * BEAT + BEAT / 2, pan=0.25)
+riser = min(DROP, 2 * BAR)
+add(noise_sweep(riser, rise=True, gain=0.25), DROP - riser, verb=0.3)
 for k in range(8):
     t = DROP - BEAT * 2 + k * BEAT / 4
     add(clap(0.12 + 0.05 * k), t, pan=0.1, verb=0.2)
-add(pluck(69, 0.5, 0.12), 0.05, pan=-0.3, verb=0.6)
-add(pluck(76, 0.5, 0.10), 0.05 + BEAT, pan=0.3, verb=0.6)
 
-# Four bars, one per service scene
-for b, (root, tones) in enumerate(CHORDS):
+for t0 in CUT['changes']:
+    add(noise_sweep(0.35, rise=False, gain=0.16), t0, pan=0.0, verb=0.3)   # whoosh on the scene change
+
+# Main section: the progression loops until the call to action; later loops add layers
+main_bars = int(round((CTA - DROP) / BAR))
+for b in range(main_bars):
+    root, tones = CHORDS[b % 4]
+    loop = b // 4
     t0 = DROP + b * BAR
     add(pad(tones + [tones[0] + 12], BAR + 0.1, gain=0.06), t0, verb=0.35)
-    add(noise_sweep(0.35, rise=False, gain=0.16), t0, pan=0.0, verb=0.3)   # whoosh on the scene change
     for beat in range(4):
         tb = t0 + beat * BEAT
         add(kick(0.7), tb)
@@ -168,23 +192,35 @@ for b, (root, tones) in enumerate(CHORDS):
         add(hat(0.16, open_=True), tb + BEAT / 2, pan=0.25)
         add(hat(0.08), tb + BEAT / 4, pan=-0.25)
         add(hat(0.08), tb + 3 * BEAT / 4, pan=-0.25)
+        if loop >= 1:
+            add(hat(0.05), tb, pan=0.4)
         add(bass(root, BEAT / 2 - 0.01), tb + BEAT / 2)
         add(bass(root + 12, BEAT / 4 - 0.01, 0.25), tb + 3 * BEAT / 4)
     for k, idx in enumerate(ARP):
         add(pluck(tones[idx] + 12), t0 + k * BEAT / 2, pan=(-0.4 if k % 2 else 0.4), verb=0.35)
-    if b == len(CHORDS) - 1:
-        # riser into the call to action
-        add(noise_sweep(BAR * 0.75, rise=True, gain=0.2), CTA - BAR * 0.75, verb=0.3)
+        if loop >= 2 and k % 2 == 0:
+            add(pluck(tones[idx] + 24, 0.2, 0.07), t0 + k * BEAT / 2 + BEAT / 4, pan=0.0, verb=0.5)
+add(noise_sweep(BAR * 0.75, rise=True, gain=0.2), CTA - BAR * 0.75, verb=0.3)   # riser into the CTA
 
 # Call to action: impact + resolving C major chord, ringing out to the end
 add(kick(1.1, big=True), CTA)
 crash = rng.standard_normal(int(SR * 2.2))
 crash = (crash - lowpass(crash, 5000)) * np.exp(-np.arange(len(crash)) / SR * 2.2) * 0.12
 add(crash, CTA, pan=0.0, verb=0.5)
-add(bass(36, 2.0, 0.5), CTA)
+add(bass(36, min(2.0, DUR - CTA), 0.5), CTA)
 add(pad([48, 55, 60, 64, 67, 72], DUR - CTA, gain=0.08, cutoff=2600), CTA, verb=0.5)
 for k, m in enumerate([72, 76, 79, 84]):
     add(pluck(m, 0.6, 0.11), CTA + 0.2 + k * BEAT / 2, pan=(-0.3 if k % 2 else 0.3), verb=0.7)
+if DUR - CTA > 3:
+    # keep the longer ending moving: soft C major arpeggio and a light pulse
+    t = CTA + 2.2
+    k = 0
+    while t < DUR - 0.6:
+        add(pluck([60, 64, 67, 72, 67, 64][k % 6] + 12, 0.4, 0.07), t, pan=(-0.3 if k % 2 else 0.3), verb=0.6)
+        if k % 2 == 0:
+            add(kick(0.35), t)
+        t += BEAT / 2
+        k += 1
 
 # ---- reverb (convolution with a decaying noise tail) ---------------------
 ir_len = int(SR * 1.6)
@@ -206,7 +242,7 @@ R += conv(verb_send, ir_r) * 0.035
 # ---- master: fades, soft clip, normalise ---------------------------------
 stereo = np.stack([L, R], axis=1)
 t = np.arange(N) / SR
-fade = np.clip(t / 0.05, 0, 1) * np.clip((DUR - t) / 1.2, 0, 1) ** 1.5
+fade = np.clip(t / 0.05, 0, 1) * np.clip((DUR - t) / (1.2 if DUR <= 15 else 1.8), 0, 1) ** 1.5
 stereo *= fade[:, None]
 stereo = np.tanh(stereo / np.max(np.abs(stereo)) * 1.4)
 stereo *= 0.89 / np.max(np.abs(stereo))
