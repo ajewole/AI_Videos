@@ -58,7 +58,7 @@ async function render(format) {
     // background music from music.py, or a silent track so platforms still accept the upload
     ...(existsSync(music) ? ['-i', music] : ['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000']),
     '-shortest',
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p',
+    '-c:v', 'libx264', '-profile:v', 'main', '-level:v', '4.0', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p',
     '-c:a', 'aac', '-b:a', '192k',
     '-movflags', '+faststart', out,
   ], { stdio: ['pipe', 'inherit', 'inherit'] });
